@@ -1,0 +1,106 @@
+<html>
+<head>
+<title>main.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cf8e6d;}
+.s1 { color: #bcbec4;}
+.s2 { color: #7a7e85;}
+.s3 { color: #bcbec4;}
+.s4 { color: #6aab73;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+main.py</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">pandas </span><span class="s0">as </span><span class="s1">pd</span>
+
+<span class="s2"># Загружаем файл Excel</span>
+<span class="s1">file_path </span><span class="s3">= </span><span class="s4">'Болезни.xlsm'</span>
+<span class="s1">df </span><span class="s3">= </span><span class="s1">pd</span><span class="s3">.</span><span class="s1">read_excel</span><span class="s3">(</span><span class="s1">file_path</span><span class="s3">, </span><span class="s1">sheet_name</span><span class="s3">=</span><span class="s4">'Лист1'</span><span class="s3">)</span>
+
+<span class="s2"># Очистка данных от пустых строк</span>
+<span class="s1">df_clean </span><span class="s3">= </span><span class="s1">df</span><span class="s3">.</span><span class="s1">dropna</span><span class="s3">(</span><span class="s1">how</span><span class="s3">=</span><span class="s4">'all'</span><span class="s3">)</span>
+
+<span class="s2"># Фильтрация умерших пациентов</span>
+<span class="s1">df_filtered </span><span class="s3">= </span><span class="s1">df_clean</span><span class="s3">[~</span><span class="s1">df_clean</span><span class="s3">[</span><span class="s4">'Исход течения болезни'</span><span class="s3">].</span><span class="s1">str</span><span class="s3">.</span><span class="s1">contains</span><span class="s3">(</span><span class="s4">'смерть'</span><span class="s3">, </span><span class="s1">na</span><span class="s3">=</span><span class="s0">False</span><span class="s3">, </span><span class="s1">case</span><span class="s3">=</span><span class="s0">False</span><span class="s3">)]</span>
+
+<span class="s2"># Разделение на две группы: грипп (Г) и ковид (U07)</span>
+<span class="s1">df_gripp </span><span class="s3">= </span><span class="s1">df_filtered</span><span class="s3">[</span><span class="s1">df_filtered</span><span class="s3">[</span><span class="s4">'Диагноз'</span><span class="s3">].</span><span class="s1">str</span><span class="s3">.</span><span class="s1">contains</span><span class="s3">(</span><span class="s4">'Г'</span><span class="s3">, </span><span class="s1">na</span><span class="s3">=</span><span class="s0">False</span><span class="s3">)]</span>
+<span class="s1">df_cov </span><span class="s3">= </span><span class="s1">df_filtered</span><span class="s3">[</span><span class="s1">df_filtered</span><span class="s3">[</span><span class="s4">'Диагноз'</span><span class="s3">].</span><span class="s1">str</span><span class="s3">.</span><span class="s1">contains</span><span class="s3">(</span><span class="s4">'U07'</span><span class="s3">, </span><span class="s1">na</span><span class="s3">=</span><span class="s0">False</span><span class="s3">)]</span>
+
+<span class="s2"># Проверка количества данных в каждой группе</span>
+<span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;Грипп:&quot;</span><span class="s3">, </span><span class="s1">df_gripp</span><span class="s3">.</span><span class="s1">shape</span><span class="s3">)</span>
+<span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;Ковид:&quot;</span><span class="s3">, </span><span class="s1">df_cov</span><span class="s3">.</span><span class="s1">shape</span><span class="s3">)</span>
+
+<span class="s0">if </span><span class="s1">df_gripp</span><span class="s3">.</span><span class="s1">empty</span><span class="s3">:</span>
+    <span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;Предупреждение: В группе гриппа нет данных.&quot;</span><span class="s3">)</span>
+<span class="s0">if </span><span class="s1">df_cov</span><span class="s3">.</span><span class="s1">empty</span><span class="s3">:</span>
+    <span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;Предупреждение: В группе ковида нет данных.&quot;</span><span class="s3">)</span>
+
+<span class="s2"># Сохраняем отфильтрованные данные в новые Excel файлы</span>
+<span class="s1">df_gripp</span><span class="s3">.</span><span class="s1">to_excel</span><span class="s3">(</span><span class="s4">'грипп.xlsx'</span><span class="s3">, </span><span class="s1">index</span><span class="s3">=</span><span class="s0">False</span><span class="s3">)</span>
+<span class="s1">df_cov</span><span class="s3">.</span><span class="s1">to_excel</span><span class="s3">(</span><span class="s4">'ковид.xlsx'</span><span class="s3">, </span><span class="s1">index</span><span class="s3">=</span><span class="s0">False</span><span class="s3">)</span>
+
+<span class="s2"># Загружаем уже отфильтрованные данные</span>
+<span class="s1">df_gripp </span><span class="s3">= </span><span class="s1">pd</span><span class="s3">.</span><span class="s1">read_excel</span><span class="s3">(</span><span class="s4">'грипп.xlsx'</span><span class="s3">)</span>
+<span class="s1">df_cov </span><span class="s3">= </span><span class="s1">pd</span><span class="s3">.</span><span class="s1">read_excel</span><span class="s3">(</span><span class="s4">'ковид.xlsx'</span><span class="s3">)</span>
+
+<span class="s2"># Функция для очистки и преобразования столбца сатурации</span>
+<span class="s0">def </span><span class="s1">clean_saturation_column</span><span class="s3">(</span><span class="s1">df</span><span class="s3">):</span>
+    <span class="s1">df</span><span class="s3">[</span><span class="s4">'Sаt O2 , % при госпитализации'</span><span class="s3">] = </span><span class="s1">pd</span><span class="s3">.</span><span class="s1">to_numeric</span><span class="s3">(</span><span class="s1">df</span><span class="s3">[</span><span class="s4">'Sаt O2 , % при госпитализации'</span><span class="s3">], </span><span class="s1">errors</span><span class="s3">=</span><span class="s4">'coerce'</span><span class="s3">)</span>
+
+<span class="s2"># Очистка столбца сатурации</span>
+<span class="s1">clean_saturation_column</span><span class="s3">(</span><span class="s1">df_gripp</span><span class="s3">)</span>
+<span class="s1">clean_saturation_column</span><span class="s3">(</span><span class="s1">df_cov</span><span class="s3">)</span>
+
+<span class="s2"># Анализ по возрасту</span>
+<span class="s0">def </span><span class="s1">analyze_age</span><span class="s3">(</span><span class="s1">df</span><span class="s3">, </span><span class="s1">group_name</span><span class="s3">):</span>
+    <span class="s1">avg_age </span><span class="s3">= </span><span class="s1">df</span><span class="s3">[</span><span class="s4">'Возраст'</span><span class="s3">].</span><span class="s1">mean</span><span class="s3">()</span>
+    <span class="s1">std_age </span><span class="s3">= </span><span class="s1">df</span><span class="s3">[</span><span class="s4">'Возраст'</span><span class="s3">].</span><span class="s1">std</span><span class="s3">()</span>
+    <span class="s1">print</span><span class="s3">(</span><span class="s4">f&quot;</span><span class="s0">{</span><span class="s1">group_name</span><span class="s0">} </span><span class="s4">- Средний возраст: </span><span class="s0">{</span><span class="s1">avg_age</span><span class="s0">:</span><span class="s4">.2f</span><span class="s0">}</span><span class="s4">, Стандартное отклонение: </span><span class="s0">{</span><span class="s1">std_age</span><span class="s0">:</span><span class="s4">.2f</span><span class="s0">}</span><span class="s4">&quot;</span><span class="s3">)</span>
+
+<span class="s2"># Анализ по полу</span>
+<span class="s0">def </span><span class="s1">analyze_gender</span><span class="s3">(</span><span class="s1">df</span><span class="s3">, </span><span class="s1">group_name</span><span class="s3">):</span>
+    <span class="s1">gender_counts </span><span class="s3">= </span><span class="s1">df</span><span class="s3">[</span><span class="s4">'Пол'</span><span class="s3">].</span><span class="s1">value_counts</span><span class="s3">()</span>
+    <span class="s1">print</span><span class="s3">(</span><span class="s4">f&quot;</span><span class="s0">{</span><span class="s1">group_name</span><span class="s0">} </span><span class="s4">- Пол:</span><span class="s0">\n{</span><span class="s1">gender_counts</span><span class="s0">}</span><span class="s4">&quot;</span><span class="s3">)</span>
+
+<span class="s2"># Анализ по продолжительности госпитализации</span>
+<span class="s0">def </span><span class="s1">analyze_hospitalization</span><span class="s3">(</span><span class="s1">df</span><span class="s3">, </span><span class="s1">group_name</span><span class="s3">):</span>
+    <span class="s1">avg_duration </span><span class="s3">= </span><span class="s1">df</span><span class="s3">[</span><span class="s4">'Продолжительность госпитализации'</span><span class="s3">].</span><span class="s1">mean</span><span class="s3">()</span>
+    <span class="s1">median_duration </span><span class="s3">= </span><span class="s1">df</span><span class="s3">[</span><span class="s4">'Продолжительность госпитализации'</span><span class="s3">].</span><span class="s1">median</span><span class="s3">()</span>
+    <span class="s1">print</span><span class="s3">(</span><span class="s4">f&quot;</span><span class="s0">{</span><span class="s1">group_name</span><span class="s0">} </span><span class="s4">- Средняя продолжительность госпитализации: </span><span class="s0">{</span><span class="s1">avg_duration</span><span class="s0">:</span><span class="s4">.2f</span><span class="s0">}</span><span class="s4">, Медиана: </span><span class="s0">{</span><span class="s1">median_duration</span><span class="s0">:</span><span class="s4">.2f</span><span class="s0">}</span><span class="s4">&quot;</span><span class="s3">)</span>
+
+<span class="s2"># Анализ по сатурации</span>
+<span class="s0">def </span><span class="s1">analyze_saturation</span><span class="s3">(</span><span class="s1">df</span><span class="s3">, </span><span class="s1">group_name</span><span class="s3">):</span>
+    <span class="s1">avg_saturation </span><span class="s3">= </span><span class="s1">df</span><span class="s3">[</span><span class="s4">'Sаt O2 , % при госпитализации'</span><span class="s3">].</span><span class="s1">mean</span><span class="s3">()</span>
+    <span class="s1">print</span><span class="s3">(</span><span class="s4">f&quot;</span><span class="s0">{</span><span class="s1">group_name</span><span class="s0">} </span><span class="s4">- Средняя сатурация при госпитализации: </span><span class="s0">{</span><span class="s1">avg_saturation</span><span class="s0">:</span><span class="s4">.2f</span><span class="s0">}</span><span class="s4">&quot;</span><span class="s3">)</span>
+
+<span class="s2"># Анализ биохимических показателей крови</span>
+<span class="s0">def </span><span class="s1">analyze_blood</span><span class="s3">(</span><span class="s1">df</span><span class="s3">, </span><span class="s1">group_name</span><span class="s3">):</span>
+    <span class="s1">blood_cols </span><span class="s3">= [</span><span class="s4">'Эритроциты'</span><span class="s3">, </span><span class="s4">'Лейкоциты'</span><span class="s3">, </span><span class="s4">'Тромбоциты'</span><span class="s3">, </span><span class="s4">'СРБ'</span><span class="s3">, </span><span class="s4">'СОЭ'</span><span class="s3">]</span>
+    <span class="s0">for </span><span class="s1">col </span><span class="s0">in </span><span class="s1">blood_cols</span><span class="s3">:</span>
+        <span class="s0">if </span><span class="s1">col </span><span class="s0">in </span><span class="s1">df</span><span class="s3">.</span><span class="s1">columns</span><span class="s3">:</span>
+            <span class="s1">avg_value </span><span class="s3">= </span><span class="s1">df</span><span class="s3">[</span><span class="s1">col</span><span class="s3">].</span><span class="s1">mean</span><span class="s3">()</span>
+            <span class="s1">print</span><span class="s3">(</span><span class="s4">f&quot;</span><span class="s0">{</span><span class="s1">group_name</span><span class="s0">} </span><span class="s4">- Средний </span><span class="s0">{</span><span class="s1">col</span><span class="s0">}</span><span class="s4">: </span><span class="s0">{</span><span class="s1">avg_value</span><span class="s0">:</span><span class="s4">.2f</span><span class="s0">}</span><span class="s4">&quot;</span><span class="s3">)</span>
+
+<span class="s2"># Анализ данных для каждой группы</span>
+<span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;Анализ группы больных гриппом:&quot;</span><span class="s3">)</span>
+<span class="s1">analyze_age</span><span class="s3">(</span><span class="s1">df_gripp</span><span class="s3">, </span><span class="s4">&quot;Грипп&quot;</span><span class="s3">)</span>
+<span class="s1">analyze_gender</span><span class="s3">(</span><span class="s1">df_gripp</span><span class="s3">, </span><span class="s4">&quot;Грипп&quot;</span><span class="s3">)</span>
+<span class="s1">analyze_hospitalization</span><span class="s3">(</span><span class="s1">df_gripp</span><span class="s3">, </span><span class="s4">&quot;Грипп&quot;</span><span class="s3">)</span>
+<span class="s1">analyze_saturation</span><span class="s3">(</span><span class="s1">df_gripp</span><span class="s3">, </span><span class="s4">&quot;Грипп&quot;</span><span class="s3">)</span>
+<span class="s1">analyze_blood</span><span class="s3">(</span><span class="s1">df_gripp</span><span class="s3">, </span><span class="s4">&quot;Грипп&quot;</span><span class="s3">)</span>
+
+<span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;</span><span class="s0">\n</span><span class="s4">Анализ группы больных ковидом:&quot;</span><span class="s3">)</span>
+<span class="s1">analyze_age</span><span class="s3">(</span><span class="s1">df_cov</span><span class="s3">, </span><span class="s4">&quot;Ковид&quot;</span><span class="s3">)</span>
+<span class="s1">analyze_gender</span><span class="s3">(</span><span class="s1">df_cov</span><span class="s3">, </span><span class="s4">&quot;Ковид&quot;</span><span class="s3">)</span>
+<span class="s1">analyze_hospitalization</span><span class="s3">(</span><span class="s1">df_cov</span><span class="s3">, </span><span class="s4">&quot;Ковид&quot;</span><span class="s3">)</span>
+<span class="s1">analyze_saturation</span><span class="s3">(</span><span class="s1">df_cov</span><span class="s3">, </span><span class="s4">&quot;Ковид&quot;</span><span class="s3">)</span>
+<span class="s1">analyze_blood</span><span class="s3">(</span><span class="s1">df_cov</span><span class="s3">, </span><span class="s4">&quot;Ковид&quot;</span><span class="s3">)</span>
+</pre>
+</body>
+</html>

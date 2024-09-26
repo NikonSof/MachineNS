@@ -1,0 +1,112 @@
+<html>
+<head>
+<title>test new.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cf8e6d;}
+.s1 { color: #bcbec4;}
+.s2 { color: #bcbec4;}
+.s3 { color: #7a7e85;}
+.s4 { color: #6aab73;}
+.s5 { color: #2aacb8;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+test new.py</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">pandas </span><span class="s0">as </span><span class="s1">pd</span>
+<span class="s0">import </span><span class="s1">matplotlib</span><span class="s2">.</span><span class="s1">pyplot </span><span class="s0">as </span><span class="s1">plt</span>
+
+<span class="s3"># Загрузка данных</span>
+<span class="s1">file_path </span><span class="s2">= </span><span class="s4">'LIST2 test.xlsx'</span>
+<span class="s1">data </span><span class="s2">= </span><span class="s1">pd</span><span class="s2">.</span><span class="s1">read_excel</span><span class="s2">(</span><span class="s1">file_path</span><span class="s2">, </span><span class="s1">sheet_name</span><span class="s2">=</span><span class="s4">'Лист2'</span><span class="s2">)</span>
+
+<span class="s3"># Очистка данных</span>
+<span class="s1">data_cleaned </span><span class="s2">= </span><span class="s1">data</span><span class="s2">.</span><span class="s1">dropna</span><span class="s2">(</span><span class="s1">how</span><span class="s2">=</span><span class="s4">'all'</span><span class="s2">, </span><span class="s1">axis</span><span class="s2">=</span><span class="s5">1</span><span class="s2">).</span><span class="s1">dropna</span><span class="s2">(</span><span class="s1">how</span><span class="s2">=</span><span class="s4">'all'</span><span class="s2">, </span><span class="s1">axis</span><span class="s2">=</span><span class="s5">0</span><span class="s2">)</span>
+
+<span class="s3"># Приведение столбца &quot;Шифр&quot; к строковому типу и приведение к верхнему регистру для точного поиска</span>
+<span class="s1">data_cleaned</span><span class="s2">[</span><span class="s4">'Шифр'</span><span class="s2">] = </span><span class="s1">data_cleaned</span><span class="s2">[</span><span class="s4">'Шифр'</span><span class="s2">].</span><span class="s1">astype</span><span class="s2">(</span><span class="s1">str</span><span class="s2">).</span><span class="s1">str</span><span class="s2">.</span><span class="s1">upper</span><span class="s2">()</span>
+
+<span class="s3"># Разделение на коронавирус и грипп по колонке 'Шифр'</span>
+<span class="s1">coronavirus_data </span><span class="s2">= </span><span class="s1">data_cleaned</span><span class="s2">[</span><span class="s1">data_cleaned</span><span class="s2">[</span><span class="s4">'Шифр'</span><span class="s2">].</span><span class="s1">str</span><span class="s2">.</span><span class="s1">contains</span><span class="s2">(</span><span class="s4">'КФ'</span><span class="s2">, </span><span class="s1">na</span><span class="s2">=</span><span class="s0">False</span><span class="s2">)]</span>
+<span class="s1">flu_data </span><span class="s2">= </span><span class="s1">data_cleaned</span><span class="s2">[</span><span class="s1">data_cleaned</span><span class="s2">[</span><span class="s4">'Шифр'</span><span class="s2">].</span><span class="s1">str</span><span class="s2">.</span><span class="s1">contains</span><span class="s2">(</span><span class="s4">'Г'</span><span class="s2">, </span><span class="s1">na</span><span class="s2">=</span><span class="s0">False</span><span class="s2">)]</span>
+
+<span class="s3"># Подсчет количества случаев</span>
+<span class="s1">coronavirus_count </span><span class="s2">= </span><span class="s1">coronavirus_data</span><span class="s2">.</span><span class="s1">shape</span><span class="s2">[</span><span class="s5">0</span><span class="s2">]</span>
+<span class="s1">flu_count </span><span class="s2">= </span><span class="s1">flu_data</span><span class="s2">.</span><span class="s1">shape</span><span class="s2">[</span><span class="s5">0</span><span class="s2">]</span>
+
+<span class="s3"># Анализ: распределение по возрасту, полу, пневмонии и патологиям для каждой категории</span>
+<span class="s1">coronavirus_age_dist </span><span class="s2">= </span><span class="s1">coronavirus_data</span><span class="s2">[</span><span class="s4">'Код возраста'</span><span class="s2">].</span><span class="s1">value_counts</span><span class="s2">()</span>
+<span class="s1">flu_age_dist </span><span class="s2">= </span><span class="s1">flu_data</span><span class="s2">[</span><span class="s4">'Код возраста'</span><span class="s2">].</span><span class="s1">value_counts</span><span class="s2">()</span>
+
+<span class="s1">coronavirus_gender_dist </span><span class="s2">= </span><span class="s1">coronavirus_data</span><span class="s2">[</span><span class="s4">'Пол'</span><span class="s2">].</span><span class="s1">value_counts</span><span class="s2">()</span>
+<span class="s1">flu_gender_dist </span><span class="s2">= </span><span class="s1">flu_data</span><span class="s2">[</span><span class="s4">'Пол'</span><span class="s2">].</span><span class="s1">value_counts</span><span class="s2">()</span>
+
+<span class="s1">coronavirus_pneumonia_dist </span><span class="s2">= </span><span class="s1">coronavirus_data</span><span class="s2">[</span><span class="s4">'пневмония'</span><span class="s2">].</span><span class="s1">value_counts</span><span class="s2">()</span>
+<span class="s1">flu_pneumonia_dist </span><span class="s2">= </span><span class="s1">flu_data</span><span class="s2">[</span><span class="s4">'пневмония'</span><span class="s2">].</span><span class="s1">value_counts</span><span class="s2">()</span>
+
+<span class="s1">coronavirus_pathology_dist </span><span class="s2">= </span><span class="s1">coronavirus_data</span><span class="s2">[</span><span class="s4">'Категория сопутствующей патологии'</span><span class="s2">].</span><span class="s1">value_counts</span><span class="s2">()</span>
+<span class="s1">flu_pathology_dist </span><span class="s2">= </span><span class="s1">flu_data</span><span class="s2">[</span><span class="s4">'Категория сопутствующей патологии'</span><span class="s2">].</span><span class="s1">value_counts</span><span class="s2">()</span>
+
+<span class="s3"># Визуализация</span>
+<span class="s1">fig</span><span class="s2">, </span><span class="s1">axs </span><span class="s2">= </span><span class="s1">plt</span><span class="s2">.</span><span class="s1">subplots</span><span class="s2">(</span><span class="s5">4</span><span class="s2">, </span><span class="s5">2</span><span class="s2">, </span><span class="s1">figsize</span><span class="s2">=(</span><span class="s5">10</span><span class="s2">, </span><span class="s5">15</span><span class="s2">))</span>
+
+<span class="s3"># 1. График для распределения возрастов (Коронавирус)</span>
+<span class="s1">axs</span><span class="s2">[</span><span class="s5">0</span><span class="s2">, </span><span class="s5">0</span><span class="s2">].</span><span class="s1">bar</span><span class="s2">(</span><span class="s1">coronavirus_age_dist</span><span class="s2">.</span><span class="s1">index</span><span class="s2">.</span><span class="s1">astype</span><span class="s2">(</span><span class="s1">str</span><span class="s2">), </span><span class="s1">coronavirus_age_dist</span><span class="s2">.</span><span class="s1">values</span><span class="s2">, </span><span class="s1">color</span><span class="s2">=</span><span class="s4">'lightblue'</span><span class="s2">)</span>
+<span class="s1">axs</span><span class="s2">[</span><span class="s5">0</span><span class="s2">, </span><span class="s5">0</span><span class="s2">].</span><span class="s1">set_title</span><span class="s2">(</span><span class="s4">'Коронавирус (КФ): Распределение по возрасту'</span><span class="s2">)</span>
+<span class="s1">axs</span><span class="s2">[</span><span class="s5">0</span><span class="s2">, </span><span class="s5">0</span><span class="s2">].</span><span class="s1">set_xlabel</span><span class="s2">(</span><span class="s4">'Возрастная группа'</span><span class="s2">)</span>
+<span class="s1">axs</span><span class="s2">[</span><span class="s5">0</span><span class="s2">, </span><span class="s5">0</span><span class="s2">].</span><span class="s1">set_ylabel</span><span class="s2">(</span><span class="s4">'Количество случаев'</span><span class="s2">)</span>
+
+<span class="s3"># 2. График для распределения возрастов (Грипп)</span>
+<span class="s1">axs</span><span class="s2">[</span><span class="s5">0</span><span class="s2">, </span><span class="s5">1</span><span class="s2">].</span><span class="s1">bar</span><span class="s2">(</span><span class="s1">flu_age_dist</span><span class="s2">.</span><span class="s1">index</span><span class="s2">.</span><span class="s1">astype</span><span class="s2">(</span><span class="s1">str</span><span class="s2">), </span><span class="s1">flu_age_dist</span><span class="s2">.</span><span class="s1">values</span><span class="s2">, </span><span class="s1">color</span><span class="s2">=</span><span class="s4">'lightgreen'</span><span class="s2">)</span>
+<span class="s1">axs</span><span class="s2">[</span><span class="s5">0</span><span class="s2">, </span><span class="s5">1</span><span class="s2">].</span><span class="s1">set_title</span><span class="s2">(</span><span class="s4">'Грипп (Г): Распределение по возрасту'</span><span class="s2">)</span>
+<span class="s1">axs</span><span class="s2">[</span><span class="s5">0</span><span class="s2">, </span><span class="s5">1</span><span class="s2">].</span><span class="s1">set_xlabel</span><span class="s2">(</span><span class="s4">'Возрастная группа'</span><span class="s2">)</span>
+<span class="s1">axs</span><span class="s2">[</span><span class="s5">0</span><span class="s2">, </span><span class="s5">1</span><span class="s2">].</span><span class="s1">set_ylabel</span><span class="s2">(</span><span class="s4">'Количество случаев'</span><span class="s2">)</span>
+
+<span class="s3"># 3. График для распределения пола (Коронавирус)</span>
+<span class="s1">axs</span><span class="s2">[</span><span class="s5">1</span><span class="s2">, </span><span class="s5">0</span><span class="s2">].</span><span class="s1">bar</span><span class="s2">(</span><span class="s1">coronavirus_gender_dist</span><span class="s2">.</span><span class="s1">index</span><span class="s2">.</span><span class="s1">astype</span><span class="s2">(</span><span class="s1">str</span><span class="s2">), </span><span class="s1">coronavirus_gender_dist</span><span class="s2">.</span><span class="s1">values</span><span class="s2">, </span><span class="s1">color</span><span class="s2">=</span><span class="s4">'lightblue'</span><span class="s2">)</span>
+<span class="s1">axs</span><span class="s2">[</span><span class="s5">1</span><span class="s2">, </span><span class="s5">0</span><span class="s2">].</span><span class="s1">set_title</span><span class="s2">(</span><span class="s4">'Коронавирус (КФ): Распределение по полу'</span><span class="s2">)</span>
+<span class="s1">axs</span><span class="s2">[</span><span class="s5">1</span><span class="s2">, </span><span class="s5">0</span><span class="s2">].</span><span class="s1">set_xlabel</span><span class="s2">(</span><span class="s4">'Пол'</span><span class="s2">)</span>
+<span class="s1">axs</span><span class="s2">[</span><span class="s5">1</span><span class="s2">, </span><span class="s5">0</span><span class="s2">].</span><span class="s1">set_ylabel</span><span class="s2">(</span><span class="s4">'Количество случаев'</span><span class="s2">)</span>
+
+<span class="s3"># 4. График для распределения пола (Грипп)</span>
+<span class="s1">axs</span><span class="s2">[</span><span class="s5">1</span><span class="s2">, </span><span class="s5">1</span><span class="s2">].</span><span class="s1">bar</span><span class="s2">(</span><span class="s1">flu_gender_dist</span><span class="s2">.</span><span class="s1">index</span><span class="s2">.</span><span class="s1">astype</span><span class="s2">(</span><span class="s1">str</span><span class="s2">), </span><span class="s1">flu_gender_dist</span><span class="s2">.</span><span class="s1">values</span><span class="s2">, </span><span class="s1">color</span><span class="s2">=</span><span class="s4">'lightgreen'</span><span class="s2">)</span>
+<span class="s1">axs</span><span class="s2">[</span><span class="s5">1</span><span class="s2">, </span><span class="s5">1</span><span class="s2">].</span><span class="s1">set_title</span><span class="s2">(</span><span class="s4">'Грипп (Г): Распределение по полу'</span><span class="s2">)</span>
+<span class="s1">axs</span><span class="s2">[</span><span class="s5">1</span><span class="s2">, </span><span class="s5">1</span><span class="s2">].</span><span class="s1">set_xlabel</span><span class="s2">(</span><span class="s4">'Пол'</span><span class="s2">)</span>
+<span class="s1">axs</span><span class="s2">[</span><span class="s5">1</span><span class="s2">, </span><span class="s5">1</span><span class="s2">].</span><span class="s1">set_ylabel</span><span class="s2">(</span><span class="s4">'Количество случаев'</span><span class="s2">)</span>
+
+<span class="s3"># 5. График для распределения пневмонии (Коронавирус)</span>
+<span class="s1">axs</span><span class="s2">[</span><span class="s5">2</span><span class="s2">, </span><span class="s5">0</span><span class="s2">].</span><span class="s1">bar</span><span class="s2">(</span><span class="s1">coronavirus_pneumonia_dist</span><span class="s2">.</span><span class="s1">index</span><span class="s2">.</span><span class="s1">astype</span><span class="s2">(</span><span class="s1">str</span><span class="s2">), </span><span class="s1">coronavirus_pneumonia_dist</span><span class="s2">.</span><span class="s1">values</span><span class="s2">, </span><span class="s1">color</span><span class="s2">=</span><span class="s4">'lightblue'</span><span class="s2">)</span>
+<span class="s1">axs</span><span class="s2">[</span><span class="s5">2</span><span class="s2">, </span><span class="s5">0</span><span class="s2">].</span><span class="s1">set_title</span><span class="s2">(</span><span class="s4">'Коронавирус (КФ): Распределение по пневмонии'</span><span class="s2">)</span>
+<span class="s1">axs</span><span class="s2">[</span><span class="s5">2</span><span class="s2">, </span><span class="s5">0</span><span class="s2">].</span><span class="s1">set_xlabel</span><span class="s2">(</span><span class="s4">'Пневмония'</span><span class="s2">)</span>
+<span class="s1">axs</span><span class="s2">[</span><span class="s5">2</span><span class="s2">, </span><span class="s5">0</span><span class="s2">].</span><span class="s1">set_ylabel</span><span class="s2">(</span><span class="s4">'Количество случаев'</span><span class="s2">)</span>
+
+<span class="s3"># 6. График для распределения пневмонии (Грипп)</span>
+<span class="s1">axs</span><span class="s2">[</span><span class="s5">2</span><span class="s2">, </span><span class="s5">1</span><span class="s2">].</span><span class="s1">bar</span><span class="s2">(</span><span class="s1">flu_pneumonia_dist</span><span class="s2">.</span><span class="s1">index</span><span class="s2">.</span><span class="s1">astype</span><span class="s2">(</span><span class="s1">str</span><span class="s2">), </span><span class="s1">flu_pneumonia_dist</span><span class="s2">.</span><span class="s1">values</span><span class="s2">, </span><span class="s1">color</span><span class="s2">=</span><span class="s4">'lightgreen'</span><span class="s2">)</span>
+<span class="s1">axs</span><span class="s2">[</span><span class="s5">2</span><span class="s2">, </span><span class="s5">1</span><span class="s2">].</span><span class="s1">set_title</span><span class="s2">(</span><span class="s4">'Грипп (Г): Распределение по пневмонии'</span><span class="s2">)</span>
+<span class="s1">axs</span><span class="s2">[</span><span class="s5">2</span><span class="s2">, </span><span class="s5">1</span><span class="s2">].</span><span class="s1">set_xlabel</span><span class="s2">(</span><span class="s4">'Пневмония'</span><span class="s2">)</span>
+<span class="s1">axs</span><span class="s2">[</span><span class="s5">2</span><span class="s2">, </span><span class="s5">1</span><span class="s2">].</span><span class="s1">set_ylabel</span><span class="s2">(</span><span class="s4">'Количество случаев'</span><span class="s2">)</span>
+
+<span class="s3"># 7. График для распределения патологий (Коронавирус)</span>
+<span class="s1">axs</span><span class="s2">[</span><span class="s5">3</span><span class="s2">, </span><span class="s5">0</span><span class="s2">].</span><span class="s1">bar</span><span class="s2">(</span><span class="s1">coronavirus_pathology_dist</span><span class="s2">.</span><span class="s1">index</span><span class="s2">.</span><span class="s1">astype</span><span class="s2">(</span><span class="s1">str</span><span class="s2">), </span><span class="s1">coronavirus_pathology_dist</span><span class="s2">.</span><span class="s1">values</span><span class="s2">, </span><span class="s1">color</span><span class="s2">=</span><span class="s4">'lightblue'</span><span class="s2">)</span>
+<span class="s1">axs</span><span class="s2">[</span><span class="s5">3</span><span class="s2">, </span><span class="s5">0</span><span class="s2">].</span><span class="s1">set_title</span><span class="s2">(</span><span class="s4">'Коронавирус (КФ): Сопутствующие патологии'</span><span class="s2">)</span>
+<span class="s1">axs</span><span class="s2">[</span><span class="s5">3</span><span class="s2">, </span><span class="s5">0</span><span class="s2">].</span><span class="s1">set_xlabel</span><span class="s2">(</span><span class="s4">'Патология'</span><span class="s2">)</span>
+<span class="s1">axs</span><span class="s2">[</span><span class="s5">3</span><span class="s2">, </span><span class="s5">0</span><span class="s2">].</span><span class="s1">set_ylabel</span><span class="s2">(</span><span class="s4">'Количество случаев'</span><span class="s2">)</span>
+
+<span class="s3"># 8. График для распределения патологий (Грипп)</span>
+<span class="s1">axs</span><span class="s2">[</span><span class="s5">3</span><span class="s2">, </span><span class="s5">1</span><span class="s2">].</span><span class="s1">bar</span><span class="s2">(</span><span class="s1">flu_pathology_dist</span><span class="s2">.</span><span class="s1">index</span><span class="s2">.</span><span class="s1">astype</span><span class="s2">(</span><span class="s1">str</span><span class="s2">), </span><span class="s1">flu_pathology_dist</span><span class="s2">.</span><span class="s1">values</span><span class="s2">, </span><span class="s1">color</span><span class="s2">=</span><span class="s4">'lightgreen'</span><span class="s2">)</span>
+<span class="s1">axs</span><span class="s2">[</span><span class="s5">3</span><span class="s2">, </span><span class="s5">1</span><span class="s2">].</span><span class="s1">set_title</span><span class="s2">(</span><span class="s4">'Грипп (Г): Сопутствующие патологии'</span><span class="s2">)</span>
+<span class="s1">axs</span><span class="s2">[</span><span class="s5">3</span><span class="s2">, </span><span class="s5">1</span><span class="s2">].</span><span class="s1">set_xlabel</span><span class="s2">(</span><span class="s4">'Патология'</span><span class="s2">)</span>
+<span class="s1">axs</span><span class="s2">[</span><span class="s5">3</span><span class="s2">, </span><span class="s5">1</span><span class="s2">].</span><span class="s1">set_ylabel</span><span class="s2">(</span><span class="s4">'Количество случаев'</span><span class="s2">)</span>
+
+<span class="s1">plt</span><span class="s2">.</span><span class="s1">tight_layout</span><span class="s2">()</span>
+<span class="s1">plt</span><span class="s2">.</span><span class="s1">show</span><span class="s2">()</span>
+
+<span class="s3"># Вывод результатов по категориям</span>
+<span class="s1">print</span><span class="s2">(</span><span class="s4">f&quot;Количество случаев коронавируса (КФ): </span><span class="s0">{</span><span class="s1">coronavirus_count</span><span class="s0">}</span><span class="s4">&quot;</span><span class="s2">)</span>
+<span class="s1">print</span><span class="s2">(</span><span class="s4">f&quot;Количество случаев гриппа (Г): </span><span class="s0">{</span><span class="s1">flu_count</span><span class="s0">}</span><span class="s4">&quot;</span><span class="s2">)</span></pre>
+</body>
+</html>

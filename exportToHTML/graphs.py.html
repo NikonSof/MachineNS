@@ -1,0 +1,144 @@
+<html>
+<head>
+<title>graphs.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cf8e6d;}
+.s1 { color: #bcbec4;}
+.s2 { color: #bcbec4;}
+.s3 { color: #7a7e85;}
+.s4 { color: #6aab73;}
+.s5 { color: #2aacb8;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+graphs.py</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">pandas </span><span class="s0">as </span><span class="s1">pd</span>
+<span class="s0">import </span><span class="s1">matplotlib</span><span class="s2">.</span><span class="s1">pyplot </span><span class="s0">as </span><span class="s1">plt</span>
+<span class="s0">import </span><span class="s1">seaborn </span><span class="s0">as </span><span class="s1">sns</span>
+<span class="s0">import </span><span class="s1">numpy </span><span class="s0">as </span><span class="s1">np</span>
+
+<span class="s3"># Функция для замены диапазонов на среднее значение</span>
+<span class="s0">def </span><span class="s1">convert_ranges_to_mean</span><span class="s2">(</span><span class="s1">series</span><span class="s2">):</span>
+    <span class="s0">def </span><span class="s1">convert_value</span><span class="s2">(</span><span class="s1">value</span><span class="s2">):</span>
+        <span class="s0">if </span><span class="s1">isinstance</span><span class="s2">(</span><span class="s1">value</span><span class="s2">, </span><span class="s1">str</span><span class="s2">) </span><span class="s0">and </span><span class="s4">'-' </span><span class="s0">in </span><span class="s1">value</span><span class="s2">:</span>
+            <span class="s1">low</span><span class="s2">, </span><span class="s1">high </span><span class="s2">= </span><span class="s1">map</span><span class="s2">(</span><span class="s1">float</span><span class="s2">, </span><span class="s1">value</span><span class="s2">.</span><span class="s1">split</span><span class="s2">(</span><span class="s4">'-'</span><span class="s2">))</span>
+            <span class="s0">return </span><span class="s2">(</span><span class="s1">low </span><span class="s2">+ </span><span class="s1">high</span><span class="s2">) / </span><span class="s5">2</span>
+        <span class="s0">try</span><span class="s2">:</span>
+            <span class="s0">return </span><span class="s1">float</span><span class="s2">(</span><span class="s1">value</span><span class="s2">)</span>
+        <span class="s0">except </span><span class="s1">ValueError</span><span class="s2">:</span>
+            <span class="s0">return </span><span class="s1">np</span><span class="s2">.</span><span class="s1">nan  </span><span class="s3"># если значение невозможно преобразовать в число</span>
+    <span class="s0">return </span><span class="s1">series</span><span class="s2">.</span><span class="s1">apply</span><span class="s2">(</span><span class="s1">convert_value</span><span class="s2">)</span>
+
+<span class="s3"># Чтение файлов</span>
+<span class="s1">df_gripp </span><span class="s2">= </span><span class="s1">pd</span><span class="s2">.</span><span class="s1">read_excel</span><span class="s2">(</span><span class="s4">'грипп.xlsx'</span><span class="s2">)</span>
+<span class="s1">df_cov </span><span class="s2">= </span><span class="s1">pd</span><span class="s2">.</span><span class="s1">read_excel</span><span class="s2">(</span><span class="s4">'ковид.xlsx'</span><span class="s2">)</span>
+
+<span class="s3"># Проверка названий столбцов</span>
+<span class="s1">print</span><span class="s2">(</span><span class="s4">&quot;Названия столбцов Грипп:&quot;</span><span class="s2">, </span><span class="s1">df_gripp</span><span class="s2">.</span><span class="s1">columns</span><span class="s2">)</span>
+<span class="s1">print</span><span class="s2">(</span><span class="s4">&quot;Названия столбцов Ковид:&quot;</span><span class="s2">, </span><span class="s1">df_cov</span><span class="s2">.</span><span class="s1">columns</span><span class="s2">)</span>
+
+<span class="s3"># Проверка первых строк</span>
+<span class="s1">print</span><span class="s2">(</span><span class="s4">&quot;Данные Грипп:&quot;</span><span class="s2">)</span>
+<span class="s1">print</span><span class="s2">(</span><span class="s1">df_gripp</span><span class="s2">.</span><span class="s1">head</span><span class="s2">())</span>
+<span class="s1">print</span><span class="s2">(</span><span class="s4">&quot;Данные Ковид:&quot;</span><span class="s2">)</span>
+<span class="s1">print</span><span class="s2">(</span><span class="s1">df_cov</span><span class="s2">.</span><span class="s1">head</span><span class="s2">())</span>
+
+<span class="s3"># Преобразование столбцов с диапазонами в числовой формат</span>
+<span class="s1">columns_to_convert </span><span class="s2">= [</span><span class="s4">'Sаt O2 , % при госпитализации'</span><span class="s2">, </span><span class="s4">'Продолжительность госпитализации'</span><span class="s2">]</span>
+<span class="s0">for </span><span class="s1">col </span><span class="s0">in </span><span class="s1">columns_to_convert</span><span class="s2">:</span>
+    <span class="s1">df_gripp</span><span class="s2">[</span><span class="s1">col</span><span class="s2">] = </span><span class="s1">convert_ranges_to_mean</span><span class="s2">(</span><span class="s1">df_gripp</span><span class="s2">[</span><span class="s1">col</span><span class="s2">])</span>
+    <span class="s1">df_cov</span><span class="s2">[</span><span class="s1">col</span><span class="s2">] = </span><span class="s1">convert_ranges_to_mean</span><span class="s2">(</span><span class="s1">df_cov</span><span class="s2">[</span><span class="s1">col</span><span class="s2">])</span>
+
+<span class="s3"># Удаление строк с пропусками для ключевых столбцов</span>
+<span class="s1">df_gripp_clean </span><span class="s2">= </span><span class="s1">df_gripp</span><span class="s2">.</span><span class="s1">dropna</span><span class="s2">(</span><span class="s1">subset</span><span class="s2">=[</span><span class="s4">'Возраст'</span><span class="s2">] + </span><span class="s1">columns_to_convert</span><span class="s2">)</span>
+<span class="s1">df_cov_clean </span><span class="s2">= </span><span class="s1">df_cov</span><span class="s2">.</span><span class="s1">dropna</span><span class="s2">(</span><span class="s1">subset</span><span class="s2">=[</span><span class="s4">'Возраст'</span><span class="s2">] + </span><span class="s1">columns_to_convert</span><span class="s2">)</span>
+
+<span class="s3"># Проверка размеров очищенных DataFrame</span>
+<span class="s1">print</span><span class="s2">(</span><span class="s4">&quot;Размер Грипп после очистки:&quot;</span><span class="s2">, </span><span class="s1">df_gripp_clean</span><span class="s2">.</span><span class="s1">shape</span><span class="s2">)</span>
+<span class="s1">print</span><span class="s2">(</span><span class="s4">&quot;Размер Ковид после очистки:&quot;</span><span class="s2">, </span><span class="s1">df_cov_clean</span><span class="s2">.</span><span class="s1">shape</span><span class="s2">)</span>
+
+<span class="s3"># Настройка стиля графиков</span>
+<span class="s1">sns</span><span class="s2">.</span><span class="s1">set</span><span class="s2">(</span><span class="s1">style</span><span class="s2">=</span><span class="s4">&quot;whitegrid&quot;</span><span class="s2">)</span>
+
+<span class="s3"># Функция для построения гистограммы по возрасту</span>
+<span class="s0">def </span><span class="s1">plot_age</span><span class="s2">(</span><span class="s1">df_gripp</span><span class="s2">, </span><span class="s1">df_cov</span><span class="s2">):</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">figure</span><span class="s2">(</span><span class="s1">figsize</span><span class="s2">=(</span><span class="s5">10</span><span class="s2">, </span><span class="s5">6</span><span class="s2">))</span>
+    <span class="s1">sns</span><span class="s2">.</span><span class="s1">histplot</span><span class="s2">(</span><span class="s1">df_gripp</span><span class="s2">[</span><span class="s4">'Возраст'</span><span class="s2">], </span><span class="s1">color</span><span class="s2">=</span><span class="s4">'blue'</span><span class="s2">, </span><span class="s1">label</span><span class="s2">=</span><span class="s4">'Грипп'</span><span class="s2">, </span><span class="s1">kde</span><span class="s2">=</span><span class="s0">True</span><span class="s2">, </span><span class="s1">bins</span><span class="s2">=</span><span class="s5">20</span><span class="s2">)</span>
+    <span class="s1">sns</span><span class="s2">.</span><span class="s1">histplot</span><span class="s2">(</span><span class="s1">df_cov</span><span class="s2">[</span><span class="s4">'Возраст'</span><span class="s2">], </span><span class="s1">color</span><span class="s2">=</span><span class="s4">'red'</span><span class="s2">, </span><span class="s1">label</span><span class="s2">=</span><span class="s4">'Ковид'</span><span class="s2">, </span><span class="s1">kde</span><span class="s2">=</span><span class="s0">True</span><span class="s2">, </span><span class="s1">bins</span><span class="s2">=</span><span class="s5">20</span><span class="s2">)</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">title</span><span class="s2">(</span><span class="s4">&quot;Распределение возраста (Грипп vs Ковид)&quot;</span><span class="s2">)</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">xlabel</span><span class="s2">(</span><span class="s4">&quot;Возраст&quot;</span><span class="s2">)</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">ylabel</span><span class="s2">(</span><span class="s4">&quot;Частота&quot;</span><span class="s2">)</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">legend</span><span class="s2">()</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">show</span><span class="s2">()</span>
+
+<span class="s3"># Функция для построения диаграммы распределения по полу</span>
+<span class="s0">def </span><span class="s1">plot_gender</span><span class="s2">(</span><span class="s1">df_gripp</span><span class="s2">, </span><span class="s1">df_cov</span><span class="s2">):</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">figure</span><span class="s2">(</span><span class="s1">figsize</span><span class="s2">=(</span><span class="s5">8</span><span class="s2">, </span><span class="s5">6</span><span class="s2">))</span>
+    <span class="s1">gender_data </span><span class="s2">= </span><span class="s1">pd</span><span class="s2">.</span><span class="s1">DataFrame</span><span class="s2">({</span>
+        <span class="s4">'Грипп'</span><span class="s2">: </span><span class="s1">df_gripp</span><span class="s2">[</span><span class="s4">'Пол'</span><span class="s2">].</span><span class="s1">value_counts</span><span class="s2">(),</span>
+        <span class="s4">'Ковид'</span><span class="s2">: </span><span class="s1">df_cov</span><span class="s2">[</span><span class="s4">'Пол'</span><span class="s2">].</span><span class="s1">value_counts</span><span class="s2">()</span>
+    <span class="s2">})</span>
+    <span class="s1">gender_data</span><span class="s2">.</span><span class="s1">plot</span><span class="s2">(</span><span class="s1">kind</span><span class="s2">=</span><span class="s4">'bar'</span><span class="s2">, </span><span class="s1">stacked</span><span class="s2">=</span><span class="s0">True</span><span class="s2">, </span><span class="s1">color</span><span class="s2">=[</span><span class="s4">'blue'</span><span class="s2">, </span><span class="s4">'red'</span><span class="s2">])</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">title</span><span class="s2">(</span><span class="s4">&quot;Распределение по полу (Грипп vs Ковид)&quot;</span><span class="s2">)</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">xlabel</span><span class="s2">(</span><span class="s4">&quot;Пол&quot;</span><span class="s2">)</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">ylabel</span><span class="s2">(</span><span class="s4">&quot;Количество пациентов&quot;</span><span class="s2">)</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">show</span><span class="s2">()</span>
+
+<span class="s3"># Функция для построения гистограммы продолжительности госпитализации</span>
+<span class="s0">def </span><span class="s1">plot_hospitalization</span><span class="s2">(</span><span class="s1">df_gripp</span><span class="s2">, </span><span class="s1">df_cov</span><span class="s2">):</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">figure</span><span class="s2">(</span><span class="s1">figsize</span><span class="s2">=(</span><span class="s5">10</span><span class="s2">, </span><span class="s5">6</span><span class="s2">))</span>
+    <span class="s1">sns</span><span class="s2">.</span><span class="s1">histplot</span><span class="s2">(</span><span class="s1">df_gripp</span><span class="s2">[</span><span class="s4">'Продолжительность госпитализации'</span><span class="s2">], </span><span class="s1">color</span><span class="s2">=</span><span class="s4">'blue'</span><span class="s2">, </span><span class="s1">label</span><span class="s2">=</span><span class="s4">'Грипп'</span><span class="s2">, </span><span class="s1">kde</span><span class="s2">=</span><span class="s0">True</span><span class="s2">, </span><span class="s1">bins</span><span class="s2">=</span><span class="s5">20</span><span class="s2">)</span>
+    <span class="s1">sns</span><span class="s2">.</span><span class="s1">histplot</span><span class="s2">(</span><span class="s1">df_cov</span><span class="s2">[</span><span class="s4">'Продолжительность госпитализации'</span><span class="s2">], </span><span class="s1">color</span><span class="s2">=</span><span class="s4">'red'</span><span class="s2">, </span><span class="s1">label</span><span class="s2">=</span><span class="s4">'Ковид'</span><span class="s2">, </span><span class="s1">kde</span><span class="s2">=</span><span class="s0">True</span><span class="s2">, </span><span class="s1">bins</span><span class="s2">=</span><span class="s5">20</span><span class="s2">)</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">title</span><span class="s2">(</span><span class="s4">&quot;Распределение продолжительности госпитализации (Грипп vs Ковид)&quot;</span><span class="s2">)</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">xlabel</span><span class="s2">(</span><span class="s4">&quot;Продолжительность госпитализации (дни)&quot;</span><span class="s2">)</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">ylabel</span><span class="s2">(</span><span class="s4">&quot;Частота&quot;</span><span class="s2">)</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">legend</span><span class="s2">()</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">show</span><span class="s2">()</span>
+
+<span class="s3"># Функция для построения гистограммы сатурации</span>
+<span class="s0">def </span><span class="s1">plot_saturation</span><span class="s2">(</span><span class="s1">df_gripp</span><span class="s2">, </span><span class="s1">df_cov</span><span class="s2">):</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">figure</span><span class="s2">(</span><span class="s1">figsize</span><span class="s2">=(</span><span class="s5">10</span><span class="s2">, </span><span class="s5">6</span><span class="s2">))</span>
+    <span class="s1">sns</span><span class="s2">.</span><span class="s1">histplot</span><span class="s2">(</span><span class="s1">df_gripp</span><span class="s2">[</span><span class="s4">'Sаt O2 , % при госпитализации'</span><span class="s2">], </span><span class="s1">color</span><span class="s2">=</span><span class="s4">'blue'</span><span class="s2">, </span><span class="s1">label</span><span class="s2">=</span><span class="s4">'Грипп'</span><span class="s2">, </span><span class="s1">kde</span><span class="s2">=</span><span class="s0">True</span><span class="s2">, </span><span class="s1">bins</span><span class="s2">=</span><span class="s5">20</span><span class="s2">)</span>
+    <span class="s1">sns</span><span class="s2">.</span><span class="s1">histplot</span><span class="s2">(</span><span class="s1">df_cov</span><span class="s2">[</span><span class="s4">'Sаt O2 , % при госпитализации'</span><span class="s2">], </span><span class="s1">color</span><span class="s2">=</span><span class="s4">'red'</span><span class="s2">, </span><span class="s1">label</span><span class="s2">=</span><span class="s4">'Ковид'</span><span class="s2">, </span><span class="s1">kde</span><span class="s2">=</span><span class="s0">True</span><span class="s2">, </span><span class="s1">bins</span><span class="s2">=</span><span class="s5">20</span><span class="s2">)</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">title</span><span class="s2">(</span><span class="s4">&quot;Распределение сатурации при госпитализации (Грипп vs Ковид)&quot;</span><span class="s2">)</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">xlabel</span><span class="s2">(</span><span class="s4">&quot;Сатурация O2 (%)&quot;</span><span class="s2">)</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">ylabel</span><span class="s2">(</span><span class="s4">&quot;Частота&quot;</span><span class="s2">)</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">legend</span><span class="s2">()</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">show</span><span class="s2">()</span>
+
+<span class="s3"># Функция для построения гистограммы биохимических показателей крови</span>
+<span class="s0">def </span><span class="s1">plot_blood</span><span class="s2">(</span><span class="s1">df_gripp</span><span class="s2">, </span><span class="s1">df_cov</span><span class="s2">, </span><span class="s1">column_name</span><span class="s2">):</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">figure</span><span class="s2">(</span><span class="s1">figsize</span><span class="s2">=(</span><span class="s5">10</span><span class="s2">, </span><span class="s5">6</span><span class="s2">))</span>
+    <span class="s1">sns</span><span class="s2">.</span><span class="s1">histplot</span><span class="s2">(</span><span class="s1">df_gripp</span><span class="s2">[</span><span class="s1">column_name</span><span class="s2">], </span><span class="s1">color</span><span class="s2">=</span><span class="s4">'blue'</span><span class="s2">, </span><span class="s1">label</span><span class="s2">=</span><span class="s4">'Грипп'</span><span class="s2">, </span><span class="s1">kde</span><span class="s2">=</span><span class="s0">True</span><span class="s2">, </span><span class="s1">bins</span><span class="s2">=</span><span class="s5">20</span><span class="s2">)</span>
+    <span class="s1">sns</span><span class="s2">.</span><span class="s1">histplot</span><span class="s2">(</span><span class="s1">df_cov</span><span class="s2">[</span><span class="s1">column_name</span><span class="s2">], </span><span class="s1">color</span><span class="s2">=</span><span class="s4">'red'</span><span class="s2">, </span><span class="s1">label</span><span class="s2">=</span><span class="s4">'Ковид'</span><span class="s2">, </span><span class="s1">kde</span><span class="s2">=</span><span class="s0">True</span><span class="s2">, </span><span class="s1">bins</span><span class="s2">=</span><span class="s5">20</span><span class="s2">)</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">title</span><span class="s2">(</span><span class="s4">f&quot;Распределение </span><span class="s0">{</span><span class="s1">column_name</span><span class="s0">} </span><span class="s4">(Грипп vs Ковид)&quot;</span><span class="s2">)</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">xlabel</span><span class="s2">(</span><span class="s1">column_name</span><span class="s2">)</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">ylabel</span><span class="s2">(</span><span class="s4">&quot;Частота&quot;</span><span class="s2">)</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">legend</span><span class="s2">()</span>
+    <span class="s1">plt</span><span class="s2">.</span><span class="s1">show</span><span class="s2">()</span>
+
+<span class="s3"># Определяем биохимические показатели</span>
+<span class="s1">blood_columns </span><span class="s2">= [</span><span class="s4">'Эритроциты'</span><span class="s2">, </span><span class="s4">'Лейкоциты'</span><span class="s2">, </span><span class="s4">'Тромбоциты'</span><span class="s2">, </span><span class="s4">'СРБ'</span><span class="s2">, </span><span class="s4">'СОЭ'</span><span class="s2">]</span>
+<span class="s0">for </span><span class="s1">col </span><span class="s0">in </span><span class="s1">blood_columns</span><span class="s2">:</span>
+    <span class="s0">if </span><span class="s1">col </span><span class="s0">in </span><span class="s1">df_gripp_clean</span><span class="s2">.</span><span class="s1">columns </span><span class="s0">and </span><span class="s1">col </span><span class="s0">in </span><span class="s1">df_cov_clean</span><span class="s2">.</span><span class="s1">columns</span><span class="s2">:</span>
+        <span class="s1">df_gripp_clean</span><span class="s2">[</span><span class="s1">col</span><span class="s2">] = </span><span class="s1">convert_ranges_to_mean</span><span class="s2">(</span><span class="s1">df_gripp_clean</span><span class="s2">[</span><span class="s1">col</span><span class="s2">])</span>
+        <span class="s1">df_cov_clean</span><span class="s2">[</span><span class="s1">col</span><span class="s2">] = </span><span class="s1">convert_ranges_to_mean</span><span class="s2">(</span><span class="s1">df_cov_clean</span><span class="s2">[</span><span class="s1">col</span><span class="s2">])</span>
+
+<span class="s3"># Визуализация</span>
+<span class="s1">plot_age</span><span class="s2">(</span><span class="s1">df_gripp_clean</span><span class="s2">, </span><span class="s1">df_cov_clean</span><span class="s2">)</span>
+<span class="s1">plot_gender</span><span class="s2">(</span><span class="s1">df_gripp_clean</span><span class="s2">, </span><span class="s1">df_cov_clean</span><span class="s2">)</span>
+<span class="s1">plot_hospitalization</span><span class="s2">(</span><span class="s1">df_gripp_clean</span><span class="s2">, </span><span class="s1">df_cov_clean</span><span class="s2">)</span>
+<span class="s1">plot_saturation</span><span class="s2">(</span><span class="s1">df_gripp_clean</span><span class="s2">, </span><span class="s1">df_cov_clean</span><span class="s2">)</span>
+
+<span class="s3"># Гистограммы для биохимических показателей крови</span>
+<span class="s0">for </span><span class="s1">col </span><span class="s0">in </span><span class="s1">blood_columns</span><span class="s2">:</span>
+    <span class="s0">if </span><span class="s1">col </span><span class="s0">in </span><span class="s1">df_gripp_clean</span><span class="s2">.</span><span class="s1">columns </span><span class="s0">and </span><span class="s1">col </span><span class="s0">in </span><span class="s1">df_cov_clean</span><span class="s2">.</span><span class="s1">columns</span><span class="s2">:</span>
+        <span class="s1">plot_blood</span><span class="s2">(</span><span class="s1">df_gripp_clean</span><span class="s2">, </span><span class="s1">df_cov_clean</span><span class="s2">, </span><span class="s1">col</span><span class="s2">)</span>
+</pre>
+</body>
+</html>
