@@ -29,3 +29,6 @@ def plot_column_distribution(column_name):
 # Построение графиков для всех столбцов данных
 for column in data.columns:
     plot_column_distribution(column)
+
+
+    
